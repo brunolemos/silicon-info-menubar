@@ -12,6 +12,7 @@ struct RunningApplication {
     let architecture: String
     let appImage: NSImage
     let processorIcon: NSImage
+    let opacity: Double
 }
 
 @main
@@ -60,6 +61,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
         itemImage.isTemplate = true
         statusBarItem?.button?.image = itemImage
         statusBarItem?.menu = menu
+        statusBarItem?.button?.alphaValue = app.opacity
     }
     
     
@@ -101,7 +103,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     func getApplicationInfo(application: NSRunningApplication?) ->RunningApplication{
         // Check if application is nil, passed in item is not guaranteed to be an object
         guard let runningApp = application else {
-            return RunningApplication(appName: "Unknown", architecture: "Cannot identify frontmost app", appImage: NSImage(named: "processor-icon-empty") ?? NSImage(), processorIcon: NSImage(named: "processor-icon-empty") ?? NSImage())
+            return RunningApplication(appName: "Unknown", architecture: "Cannot identify frontmost app", appImage: NSImage(named: "processor-icon-empty") ?? NSImage(), processorIcon: NSImage(named: "processor-icon-empty") ?? NSImage(), opacity: 1)
         }
         // After checking for nil, we can refer to runningApp, guarenteed to be NSRunningApplication
         let frontAppName = runningApp.localizedName ?? String()
@@ -111,10 +113,12 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
         var architecture = ""
         var processorIcon = NSImage()
+        var opacity = 1.0
         switch architectureInt {
         case NSBundleExecutableArchitectureARM64:
             architecture = "arm64 • Apple Silicon"
             processorIcon = NSImage(named: "processor-icon") ?? NSImage()
+            opacity = 0.25
         case NSBundleExecutableArchitectureI386:
             architecture = "x86 • Intel 32-bit"
             processorIcon = NSImage(named: "processor-icon-empty") ?? NSImage()
@@ -131,6 +135,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
             architecture = "Unknown • Unknown"
             processorIcon = NSImage(named: "processor-icon-empty") ?? NSImage()
         }
-        return RunningApplication(appName: frontAppName, architecture: architecture, appImage: frontAppImage, processorIcon: processorIcon)
+        return RunningApplication(appName: frontAppName, architecture: architecture, appImage: frontAppImage, processorIcon: processorIcon, opacity: opacity)
     }
 }
